@@ -1,0 +1,4 @@
+moon
+mug
+sword
+sun
