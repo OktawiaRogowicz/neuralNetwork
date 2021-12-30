@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import json
 import altair as alt
 import pandas as pd
 from PIL import Image
@@ -14,9 +15,11 @@ import streamlit.report_thread as ReportThread
 from streamlit.server.server import Server
 
 TIME = 10
+timer = TIME
 
 
-def countdown(counter, timer):
+def countdown(counter):
+    global timer
     while timer >= 0:
         counter.markdown("## %d" % timer)
         time.sleep(1)
@@ -43,8 +46,7 @@ def trim():
     return nfirstlines
 
 
-if __name__ == "__main__":
-
+def main():
     st.title("")
     counter = st.empty()
 
@@ -57,22 +59,28 @@ if __name__ == "__main__":
         for c in categories:
             f.write(c + "\n")
         f.close()
-        exit()
     st.header(category[0])
 
+    bg_color = "#ffffff"
+
+    global timer
+    if timer == 0:
+        if st.button("Next"):
+            bg_color = "#ffffff"
+
     canvas_result = st_canvas(
-        fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
+        fill_color="#000000",  # Fixed fill color with some opacity
         stroke_width=5,
-        stroke_color="#000000",
-        background_color="#ffffff",
+        stroke_color='#000000',
+        background_color=bg_color,
         update_streamlit=False,
         height=512, width=512,
-        drawing_mode="freedraw",
-        display_toolbar=False,
-        key="canvas"
+        drawing_mode='freedraw',
+        display_toolbar=True,
+        key='canvas'
     )
 
-    countdown(counter, TIME)
+    countdown(counter)
 
     pic = Image.fromarray(canvas_result.image_data, 'RGBA').convert('L')
     pic.thumbnail((128, 128), Image.ANTIALIAS)
@@ -80,8 +88,7 @@ if __name__ == "__main__":
     arr = arr.flatten()
 
     print(arr)
-    canvas_result = st.empty()
-
-    st.button("Next")
 
 
+if __name__ == "__main__":
+    main()
