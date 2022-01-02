@@ -19,7 +19,7 @@ labels_test = []
 for folder in directories:
 	if os.path.isdir(input_dir + '/' + folder):
 		folder2 = os.listdir(input_dir + '/' + folder)
-		number = folder
+		number = int(folder) - 1
 
 		index = 0
 		for image in folder2:

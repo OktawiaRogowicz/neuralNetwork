@@ -10,27 +10,33 @@ from tensorflow.keras.layers import Convolution2D, MaxPool2D, Flatten, Dense, Dr
 from tensorflow.keras import regularizers
 from tensorflow.keras.utils import to_categorical
 
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+x_train = np.load('X_train.npy')
+y_train = np.load('Y_train.npy')
+x_test = np.load('X_test.npy')
+y_test = np.load('Y_test.npy')
+
+x_train = (x_train / 255.0) - 0.5
+x_test = (x_test / 255.0) - 0.5
 
 model = Sequential([
-    Convolution2D(filters=128, kernel_size=(5, 5), input_shape=(32, 32, 3), activation='relu', padding='same'),
+    Convolution2D(filters=128, kernel_size=(5, 5), input_shape=(100, 100, 1), activation='relu', padding='valid'),
     BatchNormalization(),
-    Convolution2D(filters=128, kernel_size=(5, 5), activation='relu', padding='same'),
-    BatchNormalization(),
-    MaxPool2D((2, 2)),
-    Convolution2D(filters=64, kernel_size=(5, 5), activation='relu', padding='same'),
-    BatchNormalization(),
-    Convolution2D(filters=64, kernel_size=(5, 5), activation='relu', padding='same'),
+    Convolution2D(filters=128, kernel_size=(5, 5), activation='relu', padding='valid'),
     BatchNormalization(),
     MaxPool2D((2, 2)),
-    Convolution2D(filters=32, kernel_size=(5, 5), activation='relu', padding='same'),
+    Convolution2D(filters=64, kernel_size=(5, 5), activation='relu', padding='valid'),
     BatchNormalization(),
-    Convolution2D(filters=32, kernel_size=(5, 5), activation='relu', padding='same'),
+    Convolution2D(filters=64, kernel_size=(5, 5), activation='relu', padding='valid'),
     BatchNormalization(),
     MaxPool2D((2, 2)),
-    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='same'),
+    Convolution2D(filters=32, kernel_size=(5, 5), activation='relu', padding='valid'),
     BatchNormalization(),
-    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='same'),
+    Convolution2D(filters=32, kernel_size=(5, 5), activation='relu', padding='valid'),
+    BatchNormalization(),
+    MaxPool2D((2, 2)),
+    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
     BatchNormalization(),
     Flatten(),
     Dense(units=32, activation="relu"),
@@ -39,7 +45,7 @@ model = Sequential([
     Dropout(0.05),
     Dense(units=10, activation="softmax")
 ])
-optim = RMSprop(lr=0.001)
+optim = RMSprop(learning_rate=0.001)
 model.compile(optimizer=optim, loss='categorical_crossentropy', metrics=['accuracy'])
 
 datagen = ImageDataGenerator(
@@ -53,6 +59,9 @@ datagen = ImageDataGenerator(
     zoom_range=0.05,
 )
 
+x_train_length = len(x_train)
+
+x_train = to_categorical(x_train)
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
@@ -69,14 +78,16 @@ y_valid = y_train[:100 * batch_size]
 valid_steps = x_valid.shape[0] // batch_size
 validation_generator = datagen_valid.flow(x_valid, y_valid, batch_size=batch_size)
 
+steps = x_train_length // batch_size
+
 history = model.fit(
     train_generator,
-    steps_per_epoch=len(x_train) // batch_size,
+    steps_per_epoch=x_train_length // batch_size,
     epochs=120,
     validation_data=validation_generator,
     validation_freq=1,
     validation_steps=valid_steps,
-    verbose=1
+    verbose=2
 )
 
 print(history.history.keys())
