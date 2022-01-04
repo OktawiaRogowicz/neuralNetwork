@@ -1,4 +1,5 @@
 import os
+import random
 
 from PIL import Image
 import numpy as np
@@ -27,7 +28,7 @@ for folder in directories:
 			img = (np.array(im))
 			out = np.array(img, np.uint8)
 
-			if index < 70:
+			if random.randint(0, 100) < 70:
 				result.append(out)
 				labels.append(number)
 			else:
