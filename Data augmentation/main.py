@@ -92,6 +92,9 @@ history = model.fit(
     verbose=2
 )
 
+model.save("my_model")
+
+
 # y_train = to_categorical(y_train)
 # y_test = to_categorical(y_test)
 #
