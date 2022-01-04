@@ -31,91 +31,83 @@ x_train = (x_train / 255.0) - 0.5
 x_test = (x_test / 255.0) - 0.5
 
 model = Sequential([
-    Convolution2D(filters=128, kernel_size=(5, 5), input_shape=(100, 100, 1), activation='relu', padding='same'),
-    BatchNormalization(),
-    Convolution2D(filters=128, kernel_size=(5, 5), activation='relu', padding='same'),
+    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
     BatchNormalization(),
     MaxPool2D((2, 2)),
-    Convolution2D(filters=64, kernel_size=(5, 5), activation='relu', padding='same'),
-    BatchNormalization(),
-    Convolution2D(filters=64, kernel_size=(5, 5), activation='relu', padding='same'),
-    BatchNormalization(),
-    MaxPool2D((2, 2)),
-    Convolution2D(filters=32, kernel_size=(5, 5), activation='relu', padding='same'),
-    BatchNormalization(),
-    Convolution2D(filters=32, kernel_size=(5, 5), activation='relu', padding='same'),
-    BatchNormalization(),
-    MaxPool2D((2, 2)),
-    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='same'),
-    BatchNormalization(),
-    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='same'),
+    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
     BatchNormalization(),
     Flatten(),
     Dense(units=32, activation="relu"),
-    Dropout(0.15),
+    # Dropout(0.15),
     Dense(units=16, activation="relu"),
-    Dropout(0.05),
+    # Dropout(0.05),
     Dense(units=10, activation="softmax")
 ])
-optim = RMSprop(learning_rate=0.001)
+
+optim = RMSprop(learning_rate=0.0001)
 model.compile(optimizer=optim, loss='categorical_crossentropy', metrics=['accuracy'])
 
-# datagen = ImageDataGenerator(
-#     rotation_range=10,
-#     horizontal_flip=True,
-#     vertical_flip=False,
-#     width_shift_range=0.1,
-#     height_shift_range=0.1,
-#     rescale=1. / 255,
-#     shear_range=0.05,
-#     zoom_range=0.05,
-# )
-#
-# x_train_length = len(x_train)
-#
-# y_train = to_categorical(y_train)
-# y_test = to_categorical(y_test)
-#
-# batch_size = 64
-# train_generator = datagen.flow(x_train, y_train, batch_size=batch_size)
-#
-# datagen_valid = ImageDataGenerator(
-#     rescale=1. / 255,
-# )
-#
-# x_valid = x_train[:100 * batch_size]
-# y_valid = y_train[:100 * batch_size]
-#
-# valid_steps = x_valid.shape[0] // batch_size
-# validation_generator = datagen_valid.flow(x_valid, y_valid, batch_size=batch_size)
-#
-# steps = x_train_length // batch_size
-#
-# history = model.fit(
-#     train_generator,
-#     steps_per_epoch=x_train_length // batch_size,
-#     epochs=120,
-#     validation_data=validation_generator,
-#     validation_freq=1,
-#     validation_steps=valid_steps,
-#     verbose=2
-# )
+datagen = ImageDataGenerator(
+    rotation_range=3,
+    horizontal_flip=True,
+    vertical_flip=False,
+    width_shift_range=0.05,
+    height_shift_range=0.05,
+    shear_range=0.05,
+    zoom_range=0.05,
+)
+
+x_train_length = len(x_train)
 
 y_train = to_categorical(y_train)
 y_test = to_categorical(y_test)
 
-history = model.fit(
-   x_train,
-   y_train,
-   epochs=80,
-   validation_split=0.15,
-   verbose=2
+batch_size = 64
+train_generator = datagen.flow(x_train, y_train, batch_size=batch_size)
+
+datagen_valid = ImageDataGenerator(
+    rotation_range=3,
+    horizontal_flip=True,
+    vertical_flip=False,
+    width_shift_range=0.05,
+    height_shift_range=0.05,
+    shear_range=0.05,
+    zoom_range=0.05,
 )
+
+
+valid_steps = x_test.shape[0] // batch_size
+validation_generator = datagen_valid.flow(x_test, y_test, batch_size=batch_size)
+
+steps = x_train_length // batch_size
+
+history = model.fit(
+    train_generator,
+    steps_per_epoch=x_train_length // batch_size,
+    epochs=120,
+    validation_data=validation_generator,
+    validation_freq=1,
+    validation_steps=valid_steps,
+    verbose=2
+)
+
+# y_train = to_categorical(y_train)
+# y_test = to_categorical(y_test)
+#
+# history = model.fit(
+#    x_train,
+#    y_train,
+#    epochs=30,
+#    validation_split=0.15,
+#    verbose=2,
+#    shuffle=True
+# )
 
 eval = model.evaluate(x_test, y_test)
 print(eval)
 
 print(history.history.keys())
+
 
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])

@@ -27,7 +27,7 @@ for folder in directories:
 			img = (np.array(im))
 			out = np.array(img, np.uint8)
 
-			if index > 70:
+			if index < 70:
 				result.append(out)
 				labels.append(number)
 			else:
