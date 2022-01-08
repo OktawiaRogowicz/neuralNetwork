@@ -14,9 +14,8 @@ first = x_test[0]
 first_y = y_test[0]
 print(x_test[0])
 
-# img = Image.fromarray(first, 'L')
-# img.save('my.png')
-# img.show()
+img = Image.fromarray(x_test[81], 'L')
+img.show()
 
 sample_shape = x_test[0].shape
 img_width, img_height = sample_shape[0], sample_shape[1]
