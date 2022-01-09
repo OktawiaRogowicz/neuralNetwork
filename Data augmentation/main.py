@@ -32,7 +32,7 @@ x_train = (x_train / 255.0)
 x_test = (x_test / 255.0)
 
 model = Sequential([
-    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
+    Convolution2D(filters=16, input_shape=(100, 100, 1), kernel_size=(3, 3), activation='relu', padding='valid'),
     BatchNormalization(),
     MaxPool2D((2, 2)),
     Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
