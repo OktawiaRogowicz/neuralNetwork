@@ -32,10 +32,16 @@ x_train = (x_train / 255.0)
 x_test = (x_test / 255.0)
 
 model = Sequential([
-    Convolution2D(filters=16, input_shape=(100, 100, 1), kernel_size=(3, 3), activation='relu', padding='valid'),
+    Convolution2D(filters=32, input_shape=(100, 100, 1), kernel_size=(3, 3), activation='relu', padding='valid'),
     BatchNormalization(),
     MaxPool2D((2, 2)),
-    Convolution2D(filters=16, kernel_size=(3, 3), activation='relu', padding='valid'),
+    Convolution2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    MaxPool2D((2, 2)),
+    Convolution2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    MaxPool2D((2, 2)),
+    Convolution2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid'),
     BatchNormalization(),
     Flatten(),
     Dense(units=32, activation="relu"),
@@ -45,17 +51,19 @@ model = Sequential([
     Dense(units=10, activation="softmax")
 ])
 
+print(model.summary())
+
 optim = RMSprop(learning_rate=0.0001)
 model.compile(optimizer=optim, loss='categorical_crossentropy', metrics=['accuracy'])
 
 datagen = ImageDataGenerator(
-    rotation_range=5,
+    rotation_range=10,
     horizontal_flip=True,
     vertical_flip=False,
-    width_shift_range=0.05,
-    height_shift_range=0.05,
-    shear_range=0.05,
-    zoom_range=0.05,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    shear_range=0.1,
+    zoom_range=0.1,
 )
 
 x_train_long = np.repeat(a=x_train, repeats=10, axis=0)
@@ -72,6 +80,22 @@ y_test = to_categorical(y_test)
 
 batch_size = 64
 train_generator = datagen.flow(x_train_long, y_train_long, batch_size=batch_size)
+
+figure = plt.figure()
+i = 0
+
+# imX = x_train[0]
+# imY = np.asarray(['jakakolwiek-labelka'])
+# imX = np.expand_dims(imX, 0)
+#
+# for x_batch, y_batch in datagen.flow(imX, imY):
+#    a = figure.add_subplot(5, 5, i + 1)
+#    plt.imshow(np.squeeze(x_batch))
+#    a.axis('off')
+#    if i == 24: break
+#    i += 1
+# figure.set_size_inches(np.array(figure.get_size_inches()) * 3)
+# plt.show()
 
 datagen_valid = ImageDataGenerator(
     vertical_flip=False,
@@ -92,7 +116,7 @@ history = model.fit(
     verbose=2
 )
 
-model.save("my_model")
+# model.save("my_model")
 
 
 # y_train = to_categorical(y_train)
