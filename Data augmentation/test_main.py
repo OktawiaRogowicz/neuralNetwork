@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
 from tensorflow.keras.utils import to_categorical
 import os
 import random

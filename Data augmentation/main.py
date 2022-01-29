@@ -109,7 +109,7 @@ steps = x_train_long_length // batch_size
 history = model.fit(
     train_generator,
     steps_per_epoch=x_train_long_length // batch_size,
-    epochs=10,
+    epochs=15,
     validation_data=validation_generator,
     validation_freq=1,
     validation_steps=valid_steps,

@@ -20,4 +20,9 @@ for folder in directories:
 		background = Image.new('RGBA', im.size, (255, 255, 255))
 		alpha_composite = Image.alpha_composite(background, im)
 		resized_image = alpha_composite.resize((100, 100))
+
+		path = "resized_images/" + number
+		isExist = os.path.exists(path)
+		if not isExist:
+			os.makedirs(path)
 		resized_image.save("resized_images/" + number + "/" + image, optimize=True, quality=100)
