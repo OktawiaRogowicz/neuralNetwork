@@ -81,9 +81,9 @@ y_test = to_categorical(y_test)
 batch_size = 64
 train_generator = datagen.flow(x_train_long, y_train_long, batch_size=batch_size)
 
-figure = plt.figure()
-i = 0
-
+# figure = plt.figure()
+# i = 0
+#
 # imX = x_train[0]
 # imY = np.asarray(['jakakolwiek-labelka'])
 # imX = np.expand_dims(imX, 0)
@@ -116,20 +116,7 @@ history = model.fit(
     verbose=2
 )
 
-# model.save("my_model")
-
-
-# y_train = to_categorical(y_train)
-# y_test = to_categorical(y_test)
-#
-# history = model.fit(
-#    x_train,
-#    y_train,
-#    epochs=80,
-#    validation_split=0.15,
-#    verbose=2,
-#    shuffle=True
-# )
+model.save("my_model")
 
 eval = model.evaluate(x_test, y_test)
 print(eval)
