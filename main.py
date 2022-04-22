@@ -1,122 +1,135 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-import tensorflow as tf
-import pandas as pd
-import logging
+import numpy as np
+import tensorflow
 import matplotlib.pyplot as plt
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow import keras
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.layers import Convolution2D, MaxPool2D, Flatten, Dense, Dropout, BatchNormalization
+from tensorflow.keras import regularizers
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.datasets import mnist
 
-from IPython.display import clear_output
-from six.moves import urllib
+x_train = np.load('X_train.npy')
+y_train = np.load('Y_train.npy')
+x_test = np.load('X_test.npy')
+y_test = np.load('Y_test.npy')
 
+# (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-def create():
-    dftrain = pd.read_csv('https://storage.googleapis.com/tf-datasets/titanic/train.csv')
-    dfeval = pd.read_csv('https://storage.googleapis.com/tf-datasets/titanic/eval.csv')
+sample_shape = x_train[0].shape
+img_width, img_height = sample_shape[0], sample_shape[1]
+input_shape = (img_width, img_height, 1)
 
-    y_train = dftrain.pop('survived')
-    y_eval = dfeval.pop('survived')
+input_train = x_train.reshape(len(x_train), input_shape[0], input_shape[1], input_shape[2])
+input_test = x_test.reshape(len(x_test), input_shape[0], input_shape[1], input_shape[2])
 
-    CATEROGICAL_COLUMNS = ['sex', 'n_siblings_spouses', 'parch', 'class', 'deck', 'embark_town', 'alone']
-    NUMERIC_COLUMNS = ['age', 'fare']
+x_train = input_train
+x_test = input_test
 
-    feature_columns = []
-    for feature_name in CATEROGICAL_COLUMNS:
-        vocabulary = dftrain[feature_name].unique()
-        feature_columns.append(
-            tf.feature_column.sequence_categorical_column_with_vocabulary_list(feature_name, vocabulary))
+x_train = (x_train / 255.0)
+x_test = (x_test / 255.0)
 
-    for feature_name in NUMERIC_COLUMNS:
-        feature_columns.append(tf.feature_column.numeric_column(feature_name, dtype=tf.float32))
+model = Sequential([
+    Convolution2D(filters=32, input_shape=(100, 100, 1), kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    MaxPool2D((2, 2)),
+    Convolution2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    MaxPool2D((2, 2)),
+    Convolution2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    MaxPool2D((2, 2)),
+    Convolution2D(filters=32, kernel_size=(3, 3), activation='relu', padding='valid'),
+    BatchNormalization(),
+    Flatten(),
+    Dense(units=32, activation="relu"),
+    # Dropout(0.15),
+    Dense(units=16, activation="relu"),
+    # Dropout(0.05),
+    Dense(units=10, activation="softmax")
+])
 
-    print(feature_columns)
+print(model.summary())
 
-    train_input_fn = make_input_fn(dftrain, y_train)
-    eval_input_fn = make_input_fn(dfeval, y_eval, num_echos=1, shuffle=False)
+optim = RMSprop(learning_rate=0.0001)
+model.compile(optimizer=optim, loss='categorical_crossentropy', metrics=['accuracy'])
 
-    linear_est = tf.estimator.LinearClassifier(feature_columns=feature_columns)
+datagen = ImageDataGenerator(
+    rotation_range=10,
+    horizontal_flip=True,
+    vertical_flip=False,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    shear_range=0.1,
+    zoom_range=0.1,
+)
 
-    linear_est.train(train_input_fn)
-    result = linear_est.evaluate(eval_input_fn)
+x_train_long = np.repeat(a=x_train, repeats=10, axis=0)
+y_train_long = np.repeat(a=y_train, repeats=10, axis=0)
+x_test_long = np.repeat(a=x_test, repeats=10, axis=0)
+y_test_long = np.repeat(a=y_test, repeats=10, axis=0)
 
-    clear_output()
-    print(result['accuracy'])
-    print(result)
+x_train_long_length = len(x_train_long)
 
-    result = list(linear_est.predict(eval_input_fn))
-    print(dfeval.loc[0])
-    print(result[0]['probabilities'][1])
-    print(y_eval.loc[0])
+y_train_long = to_categorical(y_train_long)
+y_test_long = to_categorical(y_test_long)
+y_train = to_categorical(y_train)
+y_test = to_categorical(y_test)
 
+batch_size = 64
+train_generator = datagen.flow(x_train_long, y_train_long, batch_size=batch_size)
 
-def make_input_fn(data_df, label_df, num_echos=10, shuffle=True, batch_size=32):
-    def input_function():
-        ds = tf.data.Dataset.from_tensor_slices((dict(data_df), label_df))
-        if shuffle:
-            ds = ds.shuffle(1000)
-        ds = ds.batch(batch_size).repeat(num_echos)
-        return ds
+imgplot = plt.imshow(x_train[0])
+plt.show()
 
-    return input_function
+figure = plt.figure()
+i = 0
 
+imX = x_train[0]
+imY = np.asarray(['jakakolwiek-labelka'])
+imX = np.expand_dims(imX, 0)
 
-def create2():
-    CSV_COLUMN_NAMES = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth', 'Species']
-    SPECIES = ['Setosa', 'Versicolor', 'Virginica']
+for x_batch, y_batch in datagen.flow(imX, imY):
+   a = figure.add_subplot(5, 5, i + 1)
+   plt.imshow(np.squeeze(x_batch))
+   a.axis('off')
+   if i == 24: break
+   i += 1
+figure.set_size_inches(np.array(figure.get_size_inches()) * 3)
+plt.show()
 
-    train_path = tf.keras.utils.get_file("iris_training.csv",
-                                         "https://storage.googleapis.com/download.tensorflow.org/data/iris_training.csv")
-    test_path = tf.keras.utils.get_file("iris_test.csv",
-                                        "https://storage.googleapis.com/download.tensorflow.org/data/iris_test.csv")
+datagen_valid = ImageDataGenerator(
+    vertical_flip=False,
+)
 
-    train = pd.read_csv(train_path, names=CSV_COLUMN_NAMES, header=0)
-    test = pd.read_csv(test_path, names=CSV_COLUMN_NAMES, header=0)
+valid_steps = x_train.shape[0] // batch_size
+validation_generator = datagen_valid.flow(x_train, y_train, batch_size=batch_size)
 
-    train_y = train.pop('Species')
-    test_y = test.pop('Species')
+steps = x_train_long_length // batch_size
 
-    my_feature_columns = []
-    for key in train.keys():
-        my_feature_columns.append(tf.feature_column.numeric_column(key=key))
+history = model.fit(
+    train_generator,
+    steps_per_epoch=x_train_long_length // batch_size,
+    epochs=15,
+    validation_data=validation_generator,
+    validation_freq=1,
+    validation_steps=valid_steps,
+    verbose=2
+)
 
-    classifier = tf.estimator.DNNClassifier(feature_columns=my_feature_columns, hidden_units=[30, 10], n_classes=3)
-    classifier.train(input_fn=lambda: input_fn(train, train_y, training=True), steps=5000)
-    eval_result = classifier.evaluate(input_fn=lambda: input_fn(test, test_y, training=False))
-    print(eval_result)
+model.save("my_model")
 
-    features = ['SepalLength', 'SepalWidth', 'PetalLength', 'PetalWidth']
-    predict = {}
+eval = model.evaluate(x_test, y_test)
+print(eval)
 
-    print("Please type numeric values as prompted.")
-    for feature in features:
-        valid = True
-        while valid:
-            val = input(feature + ": ")
-            if not val.isdigit():
-                valid = False
-        predict[feature] = [float(val)]
+print(history.history.keys())
 
-    predictions = classifier.predict(input_fn=lambda: input_fn2(predict))
-    for pred_dict in predictions:
-        class_id = pred_dict['class_ids'][0]
-        probability = pred_dict['probabilities'][class_id]
-
-        print('Prediction is "{} ({:.1f}%)'.format(SPECIES[class_id], 100 * probability))
-
-
-def input_fn(features, labels, training=True, batch_size=256):
-    dataset = tf.data.Dataset.from_tensor_slices((dict(features), labels))
-
-    if training:
-        dataset = dataset.shuffle(1000).repeat()
-
-    return dataset.batch(batch_size)
-
-
-def input_fn2(features, batch_size=256):
-    return tf.data.Dataset.from_tensor_slices(dict(features)).batch(batch_size)
-
-
-if __name__ == '__main__':
-    logging.getLogger().setLevel(logging.INFO)
-    # create()
-    create2()
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('Model accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Valid'], loc='upper left')
+plt.show()

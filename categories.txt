@@ -1,5 +1,0 @@
-grass
-moon
-mug
-sword
-sun
