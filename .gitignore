@@ -5,6 +5,7 @@
 ### Python ###
 # Byte-compiled / optimized / DLL files
 **/.DS_Store
+.DS_Store
 
 __pycache__/
 *.py[cod]
@@ -144,4 +145,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# End of https://www.toptal.com/developers/gitignore/api/python
+# End of https://www.toptal.com/developers/gitignore/api/python.DS_Store
