@@ -43,9 +43,9 @@ play again.
 
 
 <div align="center">
-  HTML <strong>||</strong> CSS <strong>||</strong> flexbox <strong>||</strong> React <strong>||</strong> Styled components
+  HTML <strong>||</strong> CSS <strong>||</strong> flexbox <strong>||</strong> React <strong>||</strong> Styled components <strong>||</strong> TensorFlow.js
   
-  IP geolocation API <strong>||</strong> Leaflet
+   Node.js <strong>||</strong> TensorFlow <strong>||</strong> Keras <strong>||</strong> Python
   
 <strong>Heroku</strong>: <a href="neural-network-react.herokuapp.com"><strong>LIVE SITE</strong></a>
 </div>
