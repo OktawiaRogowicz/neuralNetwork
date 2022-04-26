@@ -36,7 +36,7 @@ play again.
 
 
 <div align="center">
-  <img src="https://github.com/OktawiaRogowicz/ip-address-tracker/blob/main/src/ip-address-tracker-master/img.png"
+  <img src="https://github.com/OktawiaRogowicz/neural-network-front/blob/main/utils/images/collecting3.png?raw=true"
     alt="Screenshot" width="500"/>
 </div>
 
@@ -58,10 +58,15 @@ To make my project possible, I needed to divide it into three parts.
 As one of the premises was training my own neural network, I needed big enough database, as anything less than one hundred images per category will not be useful. To collect my own database, I decided to create a website, on which players will be able to help me collect pictures for the neural network, <b>second part</b> of the project - thus the name of the project, back from the times when I promoted it online.
 
 <code>second part</code>
-...was creating neural network. After deciding on the architecture, I wrote few scripts - that can be viewed in the root folder - preprocessing collected images into much more accessible contect. Afterwards, using TensorFlow and Keras, I trained a neural network with a success rate oscillating around 81%. 
+...was creating neural network. After deciding on the architecture, I wrote few scripts - that can be viewed in the root folder - preprocessing collected images into much more accessible contect, as well as preparing data augmentation, exlarging the dataset from one hunder images per a category to over a thousand per category. Afterwards, using TensorFlow and Keras, I trained a neural network with a success rate oscillating around 81%. 
 
 <code>third part</code>
 Putting together neural network and a website prepared before. Using TensorFlow.js and Node.js, I let the user to exchange data with my neural network - and finished the game. Afterwards, thanks to JavaScript, I was able to put a few more details into the page.
+
+<div align="center">
+  <img src="https://github.com/OktawiaRogowicz/neural-network-front/blob/main/utils/images/swordDataAug.png?raw=true"
+    alt="Screenshot" width="500"/>
+</div>
 
 ### Summary
 
@@ -70,6 +75,11 @@ During building the website, about one hundred people had interacted with it. As
 Even though it is an impressive number, it is not enough for the size of this project, or rather – the specifics of its neural network. Even though its accuracy on test set has achieved around 81.5 percent, in a real-life setting, some slight imperfections made by users are enough to categorize the image wrong. 
 
 The easiest mistake and its origin to spot is “sun” categorization. It is the only one with few evident, sharp lines coming out of it. Every time the player makes a mistake and draws a sharp edge, line, or angle, it is recognized as a ray of sun. It also seems to be the category neural network defaults to, since it has a circular shape, just like a “cookie”, a “moon”,  and a part of a “mug”, but also some sharp and chaotic lines like “grass” or “broccoli”. It matches a lot of drawings that players have not intended to be a “sun” in the slightest. 
+
+<div align="center">
+  <img src="https://github.com/OktawiaRogowicz/neural-network-front/blob/main/utils/images/compareSmartphone.png?raw=true"
+    alt="Screenshot" width="500"/>
+</div>
 
 ### What I learned
 
